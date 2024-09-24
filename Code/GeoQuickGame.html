@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Georrific QuickGame</title>
+  <style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        position: relative;
+    }
+    #map {
+        position: absolute;
+        bottom: 10px;
+        right: 10px; 
+        height: 50%;
+        width: 50%;
+    }
+    #info {
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-style:bold;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color:white;
+        background: linear-gradient(to right, #516164 ,rgb(13, 25, 12));
+    }
+    body {
+        background-image: url(/Users/l/Downloads/GM1.jpeg);   
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-blend-mode: normal;
+    }
+    #score{
+        font-style:italic;
+        background: linear-gradient(to right, #ef5350, #f48fb1, #7e57c2, #2196f3, #26c6da, #43a047, #eeff41, #f9a825, #ff5722);
+    }
+
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Guess the location!</h1>
+  <div id="map"></div>
+  <div id="info">
+    <div id="coordinates"></div>
+    <div id="distance"></div>
+    <div id="score"></div>
+  </div>
+  <div id="counters">counters</div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+  <script>
+    var map = L.map('map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+    }).addTo(map);
+
+    function onMapClick(e) {
+      document.getElementById('coordinates').innerHTML = 'You guessed at ' + e.latlng.lat + ', ' + e.latlng.lng;
+
+      var greatestScore = 0
+      var clickedCoordinates = L.latLng(e.latlng.lat, e.latlng.lng);
+      var targetCoordinates = L.latLng(40.7662464, -73.9775269);
+      var distanceInKm = clickedCoordinates.distanceTo(targetCoordinates) / 1000;
+      document.getElementById('distance').innerHTML = 'Distance to target: ' + distanceInKm.toFixed(2) + ' km';
+
+      function calculateDistance(distanceInKm) {
+        return 5000 * Math.exp(-distanceInKm / 2000);
+        }
+        const distanceValue = calculateDistance(distanceInKm);
+        document.getElementById('score').innerHTML = 'Score: ' + distanceValue.toFixed(0);
+
+        if (distanceValue.toFixed(0) > greatestScore) {
+          greatestScore = distanceValue.toFixed(0)
+        }
+
+        localStorage.setItem("greatestScore", greatestScore);
+    }
+
+    map.on('click', onMapClick);
+
+  </script>
+
+
+</body>
+  <div class="Question">
+    <button id="Show-question">Attempts</button>
+  </div>
+  <div class="Popup">
+    <!-- <div class="Close-btn">&times;</div> -->
+    <div class="Form">
+      <h2>How many attempts would you like to allocate?</h2>
+      <div class="Input-element" id="userInput">
+        <input type="Text" id="Attemptcount" placeholder="Enter attempts">
+      </div>
+      <div class="Input-element">
+        <button id="Confirm-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <style>
+    .Question{
+      position:absolute;
+      top:15%;
+      left:20%;
+      transform:translate(-50%,-50%);
+    }
+    .Question button{
+      padding:10px 20px;
+      font-size:15px;
+      font-weight:600;
+      color:#222;
+      background:#f5f5f5;
+      border:none;
+      outline:none;
+      cursor:pointer;
+      border-radius:5px;
+    }
+
+    .Popup{
+      position:absolute;
+      top:14%;
+      left:18%;
+      opacity:1;
+      transform:translate(-50%,-50%);
+      width:380px;
+      padding: 5px 10px;
+      background:#fff;
+      box-shadow:2px 2px 5px 5px rgba(0,0,0,0.15);
+      border-radius:10px;
+    }
+    /*
+    .Popup{
+      position:absolute;
+      top:-150%;
+      left:20%;
+      opacity:0;
+      transform:translate(-50%,-50%) scale(1.25);
+      width:380px;
+      padding: 5px 10px;
+      background:#fff;
+      box-shadow:2px 2px 5px 5px rgba(0,0,0,0.15);
+      border-radius:10px;
+      transition:top 0ms ease-in-out 200ms,
+                opacity 200ms ease-in-out 0ms,
+                transition 20ms ease-in-out 0ms,
+    }
+    .Popup.active {
+      top:50%;
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1);
+      transition:top 0ms ease-in-out 0ms,
+                  opacity 200ms ease-in-out 0ms, 
+                  transform 20ms ease-in-out 0ms,
+    }
+    */
+    /*
+    .Popup .Close-btn{
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:15px;
+      height:15px;
+      background:#888;
+      color:#eee;
+      text-align:center;
+      line-height:15px;
+      border-radius:15px;
+      cursor:pointer;
+    }
+    */
+    .Popup .Form h2{
+      text-align:center;
+      color:#222;
+      margin:10px 0px 20px;
+      font-size:25px;
+    }
+    .Popup .Form .Input-element{
+      margin:15px 0px;
+    }
+    .Popup .Form .Input-element input[type="Text"]{
+      margin-top:5px;
+      width:100%;
+      outline:none;
+      border:1px solid #aaa;
+      border-radius:5px;
+    }
+    .Popup .Form .Input-element button{
+      width:100%;
+      height:40px;
+      border:none;
+      outline:none;
+      font-size:15px;
+      background:#222;
+      border-radius:10px;
+      cursor:pointer;
+    }
+
+  </style>
+
+  <script>
+    /*document.querySelection("#Show-question").addEventListener("click",function(){
+      document.querySelector(".Popup").classList.add("active");
+    });
+    document.querySelection("Confirm-btn").addEventListener("click",function(){
+      document.querySelector(".Popup").classList.remove("active");
+    });
+    */
+  </script>
+
+  <script>
+    let counter = 0;
+    const button = document.getElementById('map');
+    document.getElementById("Confirm-btn").onclick = function(){
+      userinputValue = document.getElementById("Attemptcount").value;
+      var userinputValue = Number(userinputValue)
+      console.log(userinputValue);
+      button.addEventListener('click', function() {
+      counter++;
+      document.getElementById('counters').textContent = counter;
+      if (counter >= userinputValue) {
+      window.location.href = "LosingScreen.html";
+    }
+    });
+    }
+  </script>
+
+<body>
+
+</body>
+
+</html>
